@@ -37,6 +37,11 @@ auto jforge::attributes::readCode(
     return code;
 }
 
+auto jforge::attributes::readSourceFile(std::istream& stream) -> SourceFile
+{
+    return { .sourceFileIndex = util::read_bytes_be<uint16_t>(stream) };
+}
+
 auto jforge::attributes::readLineNumberTable(std::istream& stream) -> LineNumberTable
 {
     LineNumberTable table;
@@ -63,13 +68,16 @@ auto jforge::attributes::readAttribute( // NOLINT (misc-no-recursion)
     if (!type)
         return std::unexpected(type.error());
 
-    std::cout << "Attribute type: " << *type << "\n";
     if (type == "Code")
     {
         auto code = readCode(stream, cp);
         if (!code)
             return std::unexpected(code.error());
         attr.value = std::move(*code);
+    }
+    else if (type == "SourceFile")
+    {
+        attr.value = readSourceFile(stream);
     }
     else if (type == "LineNumberTable")
     {

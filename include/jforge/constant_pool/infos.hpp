@@ -21,6 +21,11 @@ namespace jforge::constant_pool
         uint16_t nameIndex;
     };
 
+    struct ResolvedClassInfo
+    {
+        std::string_view name;
+    };
+
     struct StringInfo // 8
     {
         uint16_t stringIndex;
@@ -32,10 +37,24 @@ namespace jforge::constant_pool
         uint16_t nameAndTypeIndex;
     };
 
+    struct ResolvedFieldrefInfo
+    {
+        std::string_view className;
+        std::string_view name;
+        std::string_view type;
+    };
+
     struct MethodrefInfo // 10
     {
         uint16_t classIndex;
         uint16_t nameAndTypeIndex;
+    };
+
+    struct ResolvedMethodrefInfo
+    {
+        std::string_view className;
+        std::string_view name;
+        std::string_view type;
     };
 
     struct InterfaceMethodrefInfo // 11
@@ -44,10 +63,23 @@ namespace jforge::constant_pool
         uint16_t nameAndTypeIndex;
     };
 
+    struct ResolvedInterfaceMethodrefInfo
+    {
+        std::string_view className;
+        std::string_view name;
+        std::string_view type;
+    };
+
     struct NameAndTypeInfo // 12
     {
         uint16_t nameIndex;
         uint16_t descriptorIndex;
+    };
+
+    struct ResolvedNameAndTypeInfo
+    {
+        std::string_view name;
+        std::string_view type;
     };
 
     using PoolEntry = std::variant<

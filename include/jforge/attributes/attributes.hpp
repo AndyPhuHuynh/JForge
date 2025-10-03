@@ -16,7 +16,7 @@ namespace jforge::attributes
         uint16_t catchType;
     };
 
-    struct Code
+    struct Code // Section 4.7.3
     {
         uint16_t maxStack;
         uint16_t maxLocals;
@@ -28,13 +28,18 @@ namespace jforge::attributes
         std::vector<AttributeInfo> attributes;
     };
 
+    struct SourceFile // section 4.7.10
+    {
+        uint16_t sourceFileIndex;
+    };
+
     struct LineNumberTableEntry
     {
         uint16_t startPc;
         uint16_t lineNumber;
     };
 
-    struct LineNumberTable
+    struct LineNumberTable // Section 4.7.13
     {
         uint16_t length;
         std::vector<LineNumberTableEntry> entries;
@@ -42,6 +47,7 @@ namespace jforge::attributes
 
     using AttributeVariant = std::variant<
         Code,
+        SourceFile,
         LineNumberTable
     >;
 

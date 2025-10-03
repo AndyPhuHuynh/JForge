@@ -11,6 +11,7 @@
 namespace jforge::attributes
 {
     auto readCode(std::istream& stream, const constant_pool::ConstantPool& cp) -> std::expected<Code, std::string>;
+    auto readSourceFile(std::istream& stream) -> SourceFile;
     auto readLineNumberTable(std::istream& stream) -> LineNumberTable;
     auto readAttribute(std::istream& stream, const constant_pool::ConstantPool& cp) -> std::expected<AttributeInfo, std::string>;
 }

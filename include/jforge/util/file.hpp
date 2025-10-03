@@ -24,4 +24,14 @@ namespace jforge::util
             t = std::byteswap(t); // NOLINT (unreachable-code)
         return t;
     }
+
+    template <std::size_t N>
+    std::string formatHex(const uint8_t (&arr)[N]) {
+        std::string out;
+        out.reserve(N * 2);
+        for (auto b : arr) {
+            out += std::format("{:02X}", b);
+        }
+        return out;
+    }
 }
