@@ -27,6 +27,7 @@ set(INCLUDE_FILES
 
         include/jforge/util/file.hpp
         include/jforge/opcode.hpp
+        include/jforge/util/span.hpp
 )
 
 set(SOURCE_FILES

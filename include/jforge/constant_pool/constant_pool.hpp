@@ -86,17 +86,22 @@ namespace jforge::constant_pool
             return ResolvedClassInfo{ .name = *className };
         }
 
+        [[nodiscard]] constexpr auto resolveStringInfo(const StringInfo& info) const -> std::expected<std::string_view, std::string>
+        {
+            const auto& [stringIndex] = info;
+            const auto string = getUtf8(stringIndex);
+            if (!string.has_value())
+                return std::unexpected(generateUnableToGetMessage("string", stringIndex, string.error()));
+            return *string;
+        }
+
         [[nodiscard]] constexpr auto getStringInfo(const size_t index) const -> std::expected<std::string_view, std::string>
         {
             const auto entry = get(index);
             if (!entry.has_value()) return std::unexpected(entry.error());
             if (!std::holds_alternative<StringInfo>(entry->get()))
                 return std::unexpected(generateUnexpectedTypeMessage("String", index));
-            const auto& [stringIndex] = std::get<StringInfo>(entry->get());
-            const auto string = getUtf8(stringIndex);
-            if (!string.has_value())
-                return std::unexpected(generateUnableToGetMessage("string", stringIndex, string.error()));
-            return *string;
+            return resolveStringInfo(std::get<StringInfo>(entry->get()));
         }
 
         [[nodiscard]] constexpr auto getFieldrefInfo(const size_t index) const -> std::expected<ResolvedFieldrefInfo, std::string>
