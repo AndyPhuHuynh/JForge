@@ -1,15 +1,10 @@
 #include "jforge/bytecode/decoder.hpp"
 
-#include <algorithm>
 #include <iostream>
 
 #include "jforge/opcode.hpp"
 #include "jforge/util/file.hpp"
 #include "jforge/util/span.hpp"
-
-static bool canRead(const std::span<const uint8_t> bytes, const size_t index, const size_t count) {
-    return index + count <= bytes.size();
-}
 
 auto jforge::bytecode::printBytecodes(const constant_pool::ConstantPool& cp, const std::span<const uint8_t> bytes) -> void
 {
@@ -47,7 +42,7 @@ auto jforge::bytecode::printBytecodes(const constant_pool::ConstantPool& cp, con
                         std::cerr << string.error() << std::endl;
                         return;
                     }
-                    std::cout << std::format("{}: {: <14} #{: <5} // {}\n",
+                    std::cout << std::format("{}: {: <14} #{: <5} // String {}\n",
                         opcodeIndex, "ldc", poolIndex, *string);
                 }
                 else
@@ -56,9 +51,25 @@ auto jforge::bytecode::printBytecodes(const constant_pool::ConstantPool& cp, con
                     return;
                 }
             } break;
+        case OpCode::aload_0: // 0x2a
+            {
+                std::cout << std::format("{}: aload_0\n", opcodeIndex);
+            } break;
+        case OpCode::aload_1: // 0x2b
+            {
+                std::cout << std::format("{}: aload_1\n", opcodeIndex);
+            } break;
+        case OpCode::aload_2: // 0x2c
+            {
+                std::cout << std::format("{}: aload_2\n", opcodeIndex);
+            } break;
+        case OpCode::aload_3: // 0x2d
+            {
+                std::cout << std::format("{}: aload_3\n", opcodeIndex);
+            } break;
         case OpCode::ret: // 0xb1
             {
-                std::cout << std::format("{}: ret\n", opcodeIndex);
+                std::cout << std::format("{}: return\n", opcodeIndex);
             } break;
         case OpCode::getstatic: // 0xb2
             {
@@ -74,7 +85,7 @@ auto jforge::bytecode::printBytecodes(const constant_pool::ConstantPool& cp, con
                     std::cerr << fieldref.error() << "\n";
                     return;
                 }
-                std::cout << std::format("{}: {: <14} #{: <5} // {}.{}:{}\n",
+                std::cout << std::format("{}: {: <14} #{: <5} // Field {}.{}:{}\n",
                     opcodeIndex, "getstatic", fieldrefIndex, fieldref->className, fieldref->name, fieldref->type);
             } break;
         case OpCode::invokevirtual: // 0xb6
@@ -91,8 +102,25 @@ auto jforge::bytecode::printBytecodes(const constant_pool::ConstantPool& cp, con
                     std::cerr << methodref.error() << "\n";
                     return;
                 }
-                std::cout << std::format("{}: {: <14} #{: <5} // {}.{}:{}\n",
+                std::cout << std::format("{}: {: <14} #{: <5} // Method {}.{}:{}\n",
                     opcodeIndex, "invokevirtual", methodrefIndex, methodref->className, methodref->name, methodref->type);
+            } break;
+        case OpCode::invokespecial: // 0xb7
+            {
+                if (!span.can_read(2))
+                {
+                    std::cerr << "Missing operands for invokespecial\n";
+                    return;
+                }
+                const auto methodrefIndex = span.read_bytes_be<uint16_t>();
+                const auto methodref = cp.getMethodrefInfo(methodrefIndex);
+                if (!methodref.has_value())
+                {
+                    std::cerr << methodref.error() << "\n";
+                    return;
+                }
+                std::cout << std::format("{}: {: <14} #{: <5} // Method {}.{}:{}\n",
+                    opcodeIndex, "invokespecial", methodrefIndex, methodref->className, methodref->name, methodref->type);
             } break;
         }
     }

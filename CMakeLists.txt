@@ -28,6 +28,11 @@ set(INCLUDE_FILES
         include/jforge/util/file.hpp
         include/jforge/opcode.hpp
         include/jforge/util/span.hpp
+        include/jforge/builder/method_builder.hpp
+        include/jforge/builder/refs.hpp
+        include/jforge/constant_pool/hash.hpp
+        include/jforge/builder/class_builder.hpp
+        include/jforge/writer/writer.hpp
 )
 
 set(SOURCE_FILES
@@ -44,6 +49,9 @@ set(SOURCE_FILES
         src/jforge/constant_pool/parser.cpp
         src/jforge/constant_pool/tags.cpp
         src/jforge/constant_pool/printer.cpp
+        src/jforge/constant_pool/hash.cpp
+        src/jforge/constant_pool/constant_pool.cpp
+        src/jforge/builder/method_builder.cpp
 )
 
 add_executable(JForge ${INCLUDE_FILES} ${SOURCE_FILES})
