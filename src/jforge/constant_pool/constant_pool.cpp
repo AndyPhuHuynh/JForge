@@ -34,11 +34,6 @@ namespace jforge::constant_pool
         return m_entries;
     }
 
-    auto ConstantPool::realEntries() const
-    {
-        return m_entries | std::views::filter([](const PoolEntry& e) { return !std::holds_alternative<NullInfo>(e); });
-    }
-
     auto ConstantPool::operator[](const size_t index) const -> const PoolEntry&
     {
         return m_entries[index];
@@ -287,5 +282,72 @@ namespace jforge::constant_pool
         const auto index = static_cast<uint16_t>(m_entries.size() - 1);
         m_nameAndTypeEntries.emplace(hash, index);
         return index;
+    }
+
+    auto ConstantPool::getUtf8Index(const std::string_view value) const -> std::expected<uint16_t, std::string>
+    {
+        if (const auto hash = hashUtf8(value); m_utf8Entries.contains(hash))
+            return m_utf8Entries.at(hash);
+        return std::unexpected(std::format("Utf8 entry \"{}\" does not exist in the constant pool", value));
+    }
+
+    auto ConstantPool::getClassIndex(const std::string_view className) const -> std::expected<uint16_t, std::string>
+    {
+        if (const auto hash = hashClass(className); m_classEntries.contains(hash))
+            return m_classEntries.at(hash);
+        return std::unexpected(std::format("Class name \"{}\" does not exist in the constant pool", className));
+    }
+
+    auto ConstantPool::getStringIndex(const std::string_view value) const -> std::expected<uint16_t, std::string>
+    {
+        if (const auto hash = hashString(value); m_stringEntries.contains(hash))
+            return m_stringEntries.at(hash);
+        return std::unexpected(std::format("String \"{}\" does not exist in the constant pool", value));
+    }
+
+    auto ConstantPool::getFieldrefIndex(
+        const std::string_view className,
+        const std::string_view fieldName,
+        const std::string_view descriptor) const -> std::expected<uint16_t, std::string>
+    {
+        if (const auto hash = hashFieldref(className, fieldName, descriptor); m_fieldrefEntries.contains(hash))
+            return m_fieldrefEntries.at(hash);
+        return std::unexpected(std::format(
+                R"(Fieldref with className="{}", fieldName="{}", and descriptor="{}" does not exist in the constant pool)",
+                className, fieldName, descriptor));
+    }
+
+    auto ConstantPool::getMethodrefIndex(
+        const std::string_view className,
+        const std::string_view methodName,
+        const std::string_view descriptor) const -> std::expected<uint16_t, std::string>
+    {
+        if (const auto hash = hashMethodref(className, methodName, descriptor); m_methodrefEntries.contains(hash))
+            return m_methodrefEntries.at(hash);
+        return std::unexpected(std::format(
+                R"(Methodref with className="{}", methodName="{}", and descriptor="{}" does not exist in the constant pool)",
+                className, methodName, descriptor));
+    }
+
+    auto ConstantPool::getInterfaceMethodrefIndex(
+        const std::string_view className,
+        const std::string_view interfaceMethodName,
+        const std::string_view descriptor) const -> std::expected<uint16_t, std::string>
+    {
+        if (const auto hash = hashInterfaceMethodref(className, interfaceMethodName, descriptor); m_interfaceMethodrefEntries.contains(hash))
+            return m_interfaceMethodrefEntries.at(hash);
+        return std::unexpected(std::format(
+                R"(InterfaceMethodref with className="{}", interfaceMethodName="{}", and descriptor="{}" does not exist in the constant pool)",
+                className, interfaceMethodName, descriptor));
+    }
+
+    auto ConstantPool::getNameAndTypeIndex(
+        const std::string_view name,
+        const std::string_view type) const -> std::expected<uint16_t, std::string>
+    {
+        if (const auto hash = hashNameAndType(name, type); m_nameAndTypeEntries.contains(hash))
+            return m_nameAndTypeEntries.at(hash);
+        return std::unexpected(std::format(
+            R"(NameAndType with name="{}" and type="{}" does not exist in the constant pool)", name, type));
     }
 }

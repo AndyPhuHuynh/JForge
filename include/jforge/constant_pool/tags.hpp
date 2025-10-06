@@ -52,6 +52,31 @@ namespace jforge::constant_pool
         }
     }
 
+    [[nodiscard]] constexpr auto tagToNum(const Tag tag) -> uint8_t
+    {
+        switch (tag)
+        {
+        case Tag::Utf8:               return 1;
+        case Tag::Integer:            return 3;
+        case Tag::Float:              return 4;
+        case Tag::Long:               return 5;
+        case Tag::Double:             return 6;
+        case Tag::Class:              return 7;
+        case Tag::String:             return 8;
+        case Tag::Fieldref:           return 9;
+        case Tag::Methodref:          return 10;
+        case Tag::InterfaceMethodref: return 11;
+        case Tag::NameAndType:        return 12;
+        case Tag::MethodHandle:       return 15;
+        case Tag::MethodType:         return 16;
+        case Tag::Dynamic:            return 17;
+        case Tag::InvokeDynamic:      return 18;
+        case Tag::Module:             return 19;
+        case Tag::Package:            return 20;
+        default:                      return 0;
+        }
+    }
+
     [[nodiscard]] constexpr auto tagFromNum(const uint8_t num) -> Tag
     {
         switch (num)

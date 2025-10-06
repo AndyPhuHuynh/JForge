@@ -3,6 +3,7 @@
 #include <expected>
 #include <format>
 #include <functional>
+#include <ranges>
 #include <unordered_map>
 #include <vector>
 
@@ -28,7 +29,9 @@ namespace jforge::constant_pool
 
         [[nodiscard]] auto size() const -> size_t;
         [[nodiscard]] auto allEntries() const -> const std::vector<PoolEntry>&;
-        [[nodiscard]] auto realEntries() const;
+        [[nodiscard]] auto realEntries() const {
+            return m_entries | std::views::filter([](const PoolEntry& e) { return !std::holds_alternative<NullInfo>(e); });
+        }
 
         [[nodiscard]] auto operator[](size_t index) const -> const PoolEntry&;
         [[nodiscard]] auto get(size_t index) const -> std::expected<std::reference_wrapper<const PoolEntry>, std::string>;
@@ -50,5 +53,13 @@ namespace jforge::constant_pool
         auto addMethodref(std::string_view className, std::string_view methodName, std::string_view descriptor) -> uint16_t;
         auto addInterfaceMethodref(std::string_view className, std::string_view interfaceMethodName, std::string_view descriptor) -> uint16_t;
         auto addNameAndType(std::string_view name, std::string_view type) -> uint16_t;
+
+        [[nodiscard]] auto getUtf8Index(std::string_view value) const -> std::expected<uint16_t, std::string>;
+        [[nodiscard]] auto getClassIndex(std::string_view className) const -> std::expected<uint16_t, std::string>;
+        [[nodiscard]] auto getStringIndex(std::string_view value) const -> std::expected<uint16_t, std::string>;
+        [[nodiscard]] auto getFieldrefIndex(std::string_view className, std::string_view fieldName, std::string_view descriptor) const -> std::expected<uint16_t, std::string>;
+        [[nodiscard]] auto getMethodrefIndex(std::string_view className, std::string_view methodName, std::string_view descriptor) const -> std::expected<uint16_t, std::string>;
+        [[nodiscard]] auto getInterfaceMethodrefIndex(std::string_view className, std::string_view interfaceMethodName, std::string_view descriptor) const -> std::expected<uint16_t, std::string>;
+        [[nodiscard]] auto getNameAndTypeIndex(std::string_view name, std::string_view type) const -> std::expected<uint16_t, std::string>;
     };
 }

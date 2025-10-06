@@ -108,4 +108,17 @@ namespace jforge::constant_pool
             return Tag::None;
         }, entry);
     }
+
+    template <typename EntryType>
+    [[nodiscard]] constexpr auto tagFromType() -> Tag
+    {
+        if constexpr (std::is_same_v<EntryType, Utf8Info>)                    return Tag::Utf8;
+        else if constexpr (std::is_same_v<EntryType, ClassInfo>)              return Tag::Class;
+        else if constexpr (std::is_same_v<EntryType, StringInfo>)             return Tag::String;
+        else if constexpr (std::is_same_v<EntryType, FieldrefInfo>)           return Tag::Fieldref;
+        else if constexpr (std::is_same_v<EntryType, MethodrefInfo>)          return Tag::Methodref;
+        else if constexpr (std::is_same_v<EntryType, InterfaceMethodrefInfo>) return Tag::InterfaceMethodref;
+        else if constexpr (std::is_same_v<EntryType, NameAndTypeInfo>)        return Tag::NameAndType;
+        else return Tag::None;
+    }
 }

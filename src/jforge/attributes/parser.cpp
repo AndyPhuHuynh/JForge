@@ -2,9 +2,10 @@
 
 #include <iostream>
 
+#include "jforge/attributes/names.hpp"
 #include "jforge/util/file.hpp"
 
-auto jforge::attributes::readCode(
+auto jforge::attributes::readCode( // NOLINT (misc-no-recursion)
     std::istream& stream,
     const constant_pool::ConstantPool& cp) -> std::expected<Code, std::string>
 {
@@ -68,19 +69,16 @@ auto jforge::attributes::readAttribute( // NOLINT (misc-no-recursion)
     if (!type)
         return std::unexpected(type.error());
 
-    if (type == "Code")
-    {
+    if (type == CodeID) {
         auto code = readCode(stream, cp);
         if (!code)
             return std::unexpected(code.error());
         attr.value = std::move(*code);
     }
-    else if (type == "SourceFile")
-    {
+    else if (type == SourceFileID) {
         attr.value = readSourceFile(stream);
     }
-    else if (type == "LineNumberTable")
-    {
+    else if (type == LineNumberTableId) {
         attr.value = readLineNumberTable(stream);
     }
     else
