@@ -10,6 +10,13 @@ namespace jforge
         std::string value;
     };
 
+    struct ALoad0 {};
+    struct ALoad1 {};
+    struct ALoad2 {};
+    struct ALoad3 {};
+
+    struct Ret {};
+
     struct GetStatic
     {
         std::string className;
@@ -24,9 +31,22 @@ namespace jforge
         std::string descriptor;
     };
 
+    struct InvokeSpecial
+    {
+        std::string className;
+        std::string methodName;
+        std::string descriptor;
+    };
+
     using Instructions = std::variant<
-        GetStatic,
         LdcString,
-        InvokeVirtual
+        ALoad0,
+        ALoad1,
+        ALoad2,
+        ALoad3,
+        GetStatic,
+        InvokeVirtual,
+        InvokeSpecial,
+        Ret
     >;
 }

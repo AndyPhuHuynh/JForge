@@ -26,7 +26,7 @@ auto jforge::classfile::readMethodInfo(
 
 auto jforge::classfile::readClassFile(std::istream& stream) -> std::expected<ClassFile, std::string>
 {
-    ClassFile file;
+    ClassFile file{};
     stream.read(reinterpret_cast<char *>(file.magic), std::size(file.magic));
     if (file.magic[0] != 0xCA || file.magic[1] != 0xFE || file.magic[2] != 0xBA || file.magic[3] != 0xBE)
         return std::unexpected(std::format(R"(Magic value "{}" does not match 0xCAFEBABE)", util::formatHex(file.magic)));

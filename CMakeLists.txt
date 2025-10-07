@@ -41,6 +41,8 @@ set(INCLUDE_FILES
         include/jforge/util/vector.hpp
         include/jforge/attributes/length.hpp
         include/jforge/attributes/names.hpp
+        include/jforge/writer/attribute_writer.hpp
+        include/jforge/writer/classfile_writer.hpp
 )
 
 set(SOURCE_FILES
@@ -65,6 +67,9 @@ set(SOURCE_FILES
         src/jforge/builder/class_builder.cpp
         src/jforge/builder/attribute_builder.cpp
         src/jforge/attributes/length.cpp
+        include/jforge/writer/attribute_writer.hpp
+        src/jforge/writer/attribute_writer.cpp
+        src/jforge/writer/classfile_writer.cpp
 )
 
 add_executable(JForge ${INCLUDE_FILES} ${SOURCE_FILES})

@@ -26,18 +26,35 @@ int main(const int argc, const char *argv[])
     }
     if (std::string(argv[1]) == "write")
     {
+        auto init = jforge::builder::MethodBuilder(
+            jforge::access::Method::Public,
+            "<init>",
+            "()V"
+        );
+
+        init.aload0();
+        init.invokespecial("java/lang/Object", "<init>", "()V");
+        init.ret();
+
         auto mb = jforge::builder::MethodBuilder(
             jforge::access::Method::Public | jforge::access::Method::Static,
-            "main", "([Ljava/lang/String;)V)"
+            "main", "([Ljava/lang/String;)V"
         );
-        mb.getstatic("java/lang/System", "out", "Ljava/io/PrintStream");
+        mb.getstatic("java/lang/System", "out", "Ljava/io/PrintStream;");
         mb.ldcString("Hello World!");
-        mb.invokevirtual("java/io/PrintStream", "println", "(Ljava/lang/string;)V");
+        mb.invokevirtual("java/io/PrintStream", "println", "(Ljava/lang/String;)V");
+        mb.ret();
 
-        auto cb = jforge::builder::ClassBuilder();
+        auto cb = jforge::builder::ClassBuilder("Output");
+        cb.addMethod(std::move(init));
         cb.addMethod(std::move(mb));
 
-        cb.emit("./Output.class");
+        auto res = cb.emit("./Output.class");
+        if (!res)
+        {
+            std::cerr << "Failed to emit output class: " << res.error();
+            return 1;
+        }
         return 0;
     }
     auto file = std::ifstream(argv[1], std::ios::binary);

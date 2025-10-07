@@ -37,6 +37,31 @@ namespace jforge::builder
         m_instructions.emplace_back(std::in_place_type<LdcString>, LdcString { .value = std::string(str) });
     }
 
+    void MethodBuilder::aload0()
+    {
+        m_instructions.emplace_back(ALoad0{});
+    }
+
+    void MethodBuilder::aload1()
+    {
+        m_instructions.emplace_back(ALoad1{});
+    }
+
+    void MethodBuilder::aload2()
+    {
+        m_instructions.emplace_back(ALoad2{});
+    }
+
+    void MethodBuilder::aload3()
+    {
+        m_instructions.emplace_back(ALoad3{});
+    }
+
+    void MethodBuilder::ret()
+    {
+        m_instructions.emplace_back(Ret{});
+    }
+
     void MethodBuilder::getstatic(
         const std::string_view className,
         const std::string_view fieldName,
@@ -67,7 +92,22 @@ namespace jforge::builder
         );
     }
 
-    auto MethodBuilder::build(const constant_pool::ConstantPool& cp) -> std::expected<classfile::MethodInfo, std::string>
+    void MethodBuilder::invokespecial(
+        const std::string_view className,
+        const std::string_view methodName,
+        const std::string_view descriptor)
+    {
+        m_instructions.emplace_back(
+            std::in_place_type<InvokeSpecial>,
+            InvokeSpecial {
+                .className  = std::string(className),
+                .methodName = std::string(methodName),
+                .descriptor = std::string(descriptor)
+            }
+        );
+    }
+
+    auto MethodBuilder::build(const constant_pool::ConstantPool& cp) const -> std::expected<classfile::MethodInfo, std::string>
     {
         classfile::MethodInfo info;
         info.accessFlags = static_cast<uint16_t>(m_accessFlags);
@@ -82,13 +122,14 @@ namespace jforge::builder
             return std::unexpected(std::format("Unable to create method \"{}\": {}", m_name, descriptorIndex.error()));
         info.descriptorIndex = *descriptorIndex;
 
+        const auto attrName = cp.getUtf8Index(attributes::CodeID);
+        if (!attrName)
+            return std::unexpected(std::format("Unable to create method \"{}\": {}", m_name, attrName.error()));
+
         auto code = generateCodeAttribute(cp, m_instructions);
         if (!code)
             return std::unexpected(std::format("Unable to create method \"{}\": {}", m_name, code.error()));
 
-        const auto attrName = cp.getUtf8Index(attributes::CodeID);
-        if (!attrName)
-            return std::unexpected(std::format("Unable to create method \"{}\": {}", m_name, attrName.error()));
         attributes::AttributeInfo codeAttr {
             .nameIndex = *attrName,
             .length = attributes::calculateCodeLength(*code),

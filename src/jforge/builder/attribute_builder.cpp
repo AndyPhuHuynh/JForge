@@ -1,6 +1,7 @@
 #include "jforge/builder/attribute_builder.hpp"
 
 #include <iostream>
+#include <limits>
 
 #include "jforge/opcode.hpp"
 #include "jforge/util/vector.hpp"
@@ -21,10 +22,31 @@ namespace jforge::builder
         {
             auto errorMsg = std::visit([&]<typename T>(const T& inst) -> std::string {
                 if constexpr (std::is_same_v<T, LdcString>) {
-                    attr.code.push_back(static_cast<uint8_t>(OpCode::ldc));
                     const auto strIndex = cp.getStringIndex(inst.value);
                     if (!strIndex) return strIndex.error();
-                    util::push_back_be(attr.code, static_cast<uint16_t>(strIndex.value()));
+                    if (*strIndex <= std::numeric_limits<uint8_t>::max()) {
+                        attr.code.push_back(static_cast<uint8_t>(OpCode::ldc));
+                        util::push_back_be(attr.code, static_cast<uint8_t>(strIndex.value()));
+                    } else
+                    {
+                        attr.code.push_back(static_cast<uint8_t>(OpCode::ldc_w));
+                        util::push_back_be(attr.code, static_cast<uint16_t>(strIndex.value()));
+                    }
+                }
+                else if constexpr (std::is_same_v<T, ALoad0>) {
+                    attr.code.push_back(static_cast<uint8_t>(OpCode::aload_0));
+                }
+                else if constexpr (std::is_same_v<T, ALoad1>) {
+                    attr.code.push_back(static_cast<uint8_t>(OpCode::aload_1));
+                }
+                else if constexpr (std::is_same_v<T, ALoad2>) {
+                    attr.code.push_back(static_cast<uint8_t>(OpCode::aload_2));
+                }
+                else if constexpr (std::is_same_v<T, ALoad3>) {
+                    attr.code.push_back(static_cast<uint8_t>(OpCode::aload_3));
+                }
+                else if constexpr (std::is_same_v<T, Ret>) {
+                    attr.code.push_back(static_cast<uint8_t>(OpCode::ret));
                 }
                 else if constexpr (std::is_same_v<T, GetStatic>) {
                     attr.code.push_back(static_cast<uint8_t>(OpCode::getstatic));
@@ -34,6 +56,12 @@ namespace jforge::builder
                 }
                 else if constexpr (std::is_same_v<T, InvokeVirtual>) {
                     attr.code.push_back(static_cast<uint8_t>(OpCode::invokevirtual));
+                    const auto methodIndex = cp.getMethodrefIndex(inst.className, inst.methodName, inst.descriptor);
+                    if (!methodIndex) return methodIndex.error();
+                    util::push_back_be(attr.code, static_cast<uint16_t>(methodIndex.value()));
+                }
+                else if constexpr (std::is_same_v<T, InvokeSpecial>) {
+                    attr.code.push_back(static_cast<uint8_t>(OpCode::invokespecial));
                     const auto methodIndex = cp.getMethodrefIndex(inst.className, inst.methodName, inst.descriptor);
                     if (!methodIndex) return methodIndex.error();
                     util::push_back_be(attr.code, static_cast<uint16_t>(methodIndex.value()));

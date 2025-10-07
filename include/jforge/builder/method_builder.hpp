@@ -13,6 +13,7 @@ namespace jforge::builder
 {
     class MethodBuilder
     {
+        friend class ClassBuilder;
         access::Method m_accessFlags;
         std::string m_name;
         std::string m_descriptor;
@@ -27,10 +28,16 @@ namespace jforge::builder
         [[nodiscard]] auto getInstructions() const -> const std::vector<Instructions>&;
 
         void ldcString(std::string_view str);
+        void aload0();
+        void aload1();
+        void aload2();
+        void aload3();
+        void ret();
         void getstatic(std::string_view className, std::string_view fieldName, std::string_view descriptor);
         void invokevirtual(std::string_view className, std::string_view methodName, std::string_view descriptor);
+        void invokespecial(std::string_view className, std::string_view methodName, std::string_view descriptor);
 
     private:
-        auto build(const constant_pool::ConstantPool& cp) -> std::expected<classfile::MethodInfo, std::string>;
+        [[nodiscard]] auto build(const constant_pool::ConstantPool& cp) const -> std::expected<classfile::MethodInfo, std::string>;
     };
 }

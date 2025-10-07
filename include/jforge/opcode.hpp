@@ -8,6 +8,7 @@ namespace jforge
     {
         none          = 0x00,
         ldc           = 0x12,
+        ldc_w         = 0x13,
         aload_0       = 0x2a,
         aload_1       = 0x2b,
         aload_2       = 0x2c,
@@ -23,6 +24,7 @@ namespace jforge
         switch (opcode)
         {
         case 0x12: return OpCode::ldc;
+        case 0x13: return OpCode::ldc_w;
         case 0x2a: return OpCode::aload_0;
         case 0x2b: return OpCode::aload_1;
         case 0x2c: return OpCode::aload_2;
