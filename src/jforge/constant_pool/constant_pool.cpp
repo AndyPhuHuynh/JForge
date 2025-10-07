@@ -68,6 +68,42 @@ namespace jforge::constant_pool
         return std::get<Utf8Info>(entry->get()).bytes;
     }
 
+    auto ConstantPool::getInt(const size_t index) const -> std::expected<int32_t, std::string>
+    {
+        const auto entry = get(index);
+        if (!entry.has_value()) return std::unexpected(entry.error());
+        if (!std::holds_alternative<IntegerInfo>(entry->get()))
+            return std::unexpected(generateUnexpectedTypeMessage("UTF8", index));
+        return std::get<IntegerInfo>(entry->get()).value;
+    }
+
+    auto ConstantPool::getFloat(const size_t index) const -> std::expected<float, std::string>
+    {
+        const auto entry = get(index);
+        if (!entry.has_value()) return std::unexpected(entry.error());
+        if (!std::holds_alternative<FloatInfo>(entry->get()))
+            return std::unexpected(generateUnexpectedTypeMessage("UTF8", index));
+        return std::get<FloatInfo>(entry->get()).value;
+    }
+
+    auto ConstantPool::getLong(const size_t index) const -> std::expected<int64_t, std::string>
+    {
+        const auto entry = get(index);
+        if (!entry.has_value()) return std::unexpected(entry.error());
+        if (!std::holds_alternative<LongInfo>(entry->get()))
+            return std::unexpected(generateUnexpectedTypeMessage("UTF8", index));
+        return std::get<LongInfo>(entry->get()).value;
+    }
+
+    auto ConstantPool::getDouble(const size_t index) const -> std::expected<double, std::string>
+    {
+        const auto entry = get(index);
+        if (!entry.has_value()) return std::unexpected(entry.error());
+        if (!std::holds_alternative<DoubleInfo>(entry->get()))
+            return std::unexpected(generateUnexpectedTypeMessage("UTF8", index));
+        return std::get<DoubleInfo>(entry->get()).value;
+    }
+
     auto ConstantPool::getClassInfo(const size_t index) const -> std::expected<ResolvedClassInfo, std::string>
     {
         const auto entry = get(index);
@@ -189,6 +225,50 @@ namespace jforge::constant_pool
         return index;
     }
 
+    auto ConstantPool::addInt(const int32_t value) -> uint16_t
+    {
+        if (m_intEntries.contains(value))
+            return m_intEntries.at(value);
+        m_entries.emplace_back(IntegerInfo{ .value = value });
+
+        const auto index = static_cast<uint16_t>(m_entries.size() - 1);
+        m_classEntries.emplace(value, index);
+        return index;
+    }
+
+    auto ConstantPool::addFloat(const float value) -> uint16_t
+    {
+        if (m_floatEntries.contains(value))
+            return m_floatEntries.at(value);
+        m_entries.emplace_back(FloatInfo{ .value = value });
+
+        const auto index = static_cast<uint16_t>(m_entries.size() - 1);
+        m_classEntries.emplace(value, index);
+        return index;
+    }
+
+    auto ConstantPool::addLong(const int64_t value) -> uint16_t
+    {
+        if (m_longEntries.contains(value))
+            return m_longEntries.at(value);
+        m_entries.emplace_back(LongInfo{ .value = value });
+
+        const auto index = static_cast<uint16_t>(m_entries.size() - 1);
+        m_classEntries.emplace(value, index);
+        return index;
+    }
+
+    auto ConstantPool::addDouble(const double value) -> uint16_t
+    {
+        if (m_doubleEntries.contains(value))
+            return m_doubleEntries.at(value);
+        m_entries.emplace_back(DoubleInfo{ .value = value });
+
+        const auto index = static_cast<uint16_t>(m_entries.size() - 1);
+        m_classEntries.emplace(value, index);
+        return index;
+    }
+
     auto ConstantPool::addClass(const std::string_view className) -> uint16_t
     {
         const uint64_t hash = hashClass(className);
@@ -289,6 +369,34 @@ namespace jforge::constant_pool
         if (const auto hash = hashUtf8(value); m_utf8Entries.contains(hash))
             return m_utf8Entries.at(hash);
         return std::unexpected(std::format("Utf8 entry \"{}\" does not exist in the constant pool", value));
+    }
+
+    auto ConstantPool::getIntIndex(const int32_t value) const -> std::expected<uint16_t, std::string>
+    {
+        if (m_intEntries.contains(value))
+            return m_intEntries.at(value);
+        return std::unexpected(std::format("Integer \"{}\" does not exist in the constant pool", value));
+    }
+
+    auto ConstantPool::getFloatIndex(const float value) const -> std::expected<uint16_t, std::string>
+    {
+        if (m_floatEntries.contains(value))
+            return m_floatEntries.at(value);
+        return std::unexpected(std::format("float \"{}\" does not exist in the constant pool", value));
+    }
+
+    auto ConstantPool::getLongIndex(const int64_t value) const -> std::expected<uint16_t, std::string>
+    {
+        if (m_longEntries.contains(value))
+            return m_longEntries.at(value);
+        return std::unexpected(std::format("Long \"{}\" does not exist in the constant pool", value));
+    }
+
+    auto ConstantPool::getDoubleIndex(const double value) const -> std::expected<uint16_t, std::string>
+    {
+        if (m_doubleEntries.contains(value))
+            return m_doubleEntries.at(value);
+        return std::unexpected(std::format("Double \"{}\" does not exist in the constant pool", value));
     }
 
     auto ConstantPool::getClassIndex(const std::string_view className) const -> std::expected<uint16_t, std::string>

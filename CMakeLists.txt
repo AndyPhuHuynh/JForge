@@ -15,7 +15,6 @@ set(INCLUDE_FILES
         include/jforge/builder/method_builder.hpp
 
         include/jforge/bytecode/decoder.hpp
-        include/jforge/bytecode/instructions.hpp
 
         include/jforge/classfile/classfile.hpp
         include/jforge/classfile/method.hpp

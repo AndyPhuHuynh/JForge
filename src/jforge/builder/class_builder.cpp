@@ -71,14 +71,14 @@ namespace jforge::builder
             cp.addUtf8(method.getDescriptor());
             for (const auto& instruction: method.getInstructions()) {
                 std::visit([&]<typename T>(const T& inst) {
-                    if constexpr (std::is_same_v<T, GetStatic>) {
+                    if constexpr (std::is_same_v<T, InstructionLdcString>) {
+                        cp.addString(inst.value);
+                    }
+                    else if constexpr (std::is_same_v<T, InstructionFieldArg>) {
                         cp.addFieldref(inst.className, inst.fieldName, inst.descriptor);
                     }
-                    else if constexpr (std::is_same_v<T, InvokeVirtual> || std::is_same_v<T, InvokeSpecial>) {
+                    else if constexpr (std::is_same_v<T, InstructionMethodArg>) {
                         cp.addMethodref(inst.className, inst.methodName, inst.descriptor);
-                    }
-                    else if constexpr (std::is_same_v<T, LdcString>) {
-                        cp.addString(inst.value);
                     }
                 }, instruction);
             }

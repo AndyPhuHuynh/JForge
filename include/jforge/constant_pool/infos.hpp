@@ -16,6 +16,26 @@ namespace jforge::constant_pool
         std::string bytes{};
     };
 
+    struct IntegerInfo // 3
+    {
+        int32_t value;
+    };
+
+    struct FloatInfo // 4
+    {
+        float value;
+    };
+
+    struct LongInfo // 5
+    {
+        int64_t value;
+    };
+
+    struct DoubleInfo // 6
+    {
+        double value;
+    };
+
     struct ClassInfo // 7
     {
         uint16_t nameIndex;
@@ -85,6 +105,10 @@ namespace jforge::constant_pool
     using PoolEntry = std::variant<
         NullInfo,
         Utf8Info,
+        IntegerInfo,
+        FloatInfo,
+        LongInfo,
+        DoubleInfo,
         ClassInfo,
         StringInfo,
         FieldrefInfo,

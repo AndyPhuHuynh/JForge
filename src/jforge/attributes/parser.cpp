@@ -81,8 +81,7 @@ auto jforge::attributes::readAttribute( // NOLINT (misc-no-recursion)
     else if (type == LineNumberTableId) {
         attr.value = readLineNumberTable(stream);
     }
-    else
-    {
+    else {
         std::cerr << "Unsupported attribute type: " << *type << "\n";
         std::terminate();
     }

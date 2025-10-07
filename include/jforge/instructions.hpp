@@ -3,50 +3,59 @@
 #include <string>
 #include <variant>
 
+#include "opcode.hpp"
+
 namespace jforge
 {
-    struct LdcString
+
+    struct InstructionNoArg { OpCode opcode; };
+
+    struct InstructionOneArgInt8
     {
-        std::string value;
+        OpCode opcode;
+        int8_t value;
     };
 
-    struct ALoad0 {};
-    struct ALoad1 {};
-    struct ALoad2 {};
-    struct ALoad3 {};
-
-    struct Ret {};
-
-    struct GetStatic
+    struct InstructionOneArgInt16
     {
+        OpCode opcode;
+        int16_t value;
+    };
+
+    struct InstructionLdcInt    { int32_t     value; };
+    struct InstructionLdcFloat  { float       value; };
+    struct InstructionLdcLong   { int64_t     value; };
+    struct InstructionLdcDouble { double      value; };
+    struct InstructionLdcString { std::string value; };
+    struct InstructionLdcClass  { std::string className; };
+
+    struct InstructionFieldArg
+    {
+        OpCode opcode;
         std::string className;
         std::string fieldName;
         std::string descriptor;
     };
 
-    struct InvokeVirtual
+    struct InstructionMethodArg
     {
-        std::string className;
-        std::string methodName;
-        std::string descriptor;
-    };
-
-    struct InvokeSpecial
-    {
+        OpCode opcode;
         std::string className;
         std::string methodName;
         std::string descriptor;
     };
 
     using Instructions = std::variant<
-        LdcString,
-        ALoad0,
-        ALoad1,
-        ALoad2,
-        ALoad3,
-        GetStatic,
-        InvokeVirtual,
-        InvokeSpecial,
-        Ret
+        InstructionNoArg,
+        InstructionOneArgInt8,
+        InstructionOneArgInt16,
+        InstructionLdcInt,
+        InstructionLdcFloat,
+        InstructionLdcLong,
+        InstructionLdcDouble,
+        InstructionLdcClass,
+        InstructionLdcString,
+        InstructionFieldArg,
+        InstructionMethodArg
     >;
 }

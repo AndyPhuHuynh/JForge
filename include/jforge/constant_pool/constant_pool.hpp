@@ -16,6 +16,10 @@ namespace jforge::constant_pool
         using Hash  = uint64_t;
         using Index = uint16_t;
         std::unordered_map<Hash, Index> m_utf8Entries;
+        std::unordered_map<int32_t, Index> m_intEntries;
+        std::unordered_map<float, Index> m_floatEntries;
+        std::unordered_map<int64_t, Index> m_longEntries;
+        std::unordered_map<double, Index> m_doubleEntries;
         std::unordered_map<Hash, Index> m_classEntries;
         std::unordered_map<Hash, Index> m_stringEntries;
         std::unordered_map<Hash, Index> m_fieldrefEntries;
@@ -38,6 +42,10 @@ namespace jforge::constant_pool
 
         auto addEntry(PoolEntry entry) -> PoolEntry&;
         [[nodiscard]] auto getUtf8(size_t index) const -> std::expected<std::string_view, std::string>;
+        [[nodiscard]] auto getInt(size_t index) const -> std::expected<int32_t, std::string>;
+        [[nodiscard]] auto getFloat(size_t index) const -> std::expected<float, std::string>;
+        [[nodiscard]] auto getLong(size_t index) const -> std::expected<int64_t, std::string>;
+        [[nodiscard]] auto getDouble(size_t index) const -> std::expected<double, std::string>;
         [[nodiscard]] auto getClassInfo(size_t index) const -> std::expected<ResolvedClassInfo, std::string>;
         [[nodiscard]] auto resolveStringInfo(const StringInfo& info) const -> std::expected<std::string_view, std::string>;
         [[nodiscard]] auto getStringInfo(size_t index) const -> std::expected<std::string_view, std::string>;
@@ -47,6 +55,10 @@ namespace jforge::constant_pool
         [[nodiscard]] auto getNameAndTypeInfo(size_t index) const -> std::expected<ResolvedNameAndTypeInfo, std::string>;
 
         auto addUtf8(std::string_view value) -> uint16_t;
+        auto addInt(int32_t value) -> uint16_t;
+        auto addFloat(float value) -> uint16_t;
+        auto addLong(int64_t value) -> uint16_t;
+        auto addDouble(double value) -> uint16_t;
         auto addClass(std::string_view className) -> uint16_t;
         auto addString(std::string_view value) -> uint16_t;
         auto addFieldref(std::string_view className, std::string_view fieldName, std::string_view descriptor) -> uint16_t;
@@ -55,6 +67,10 @@ namespace jforge::constant_pool
         auto addNameAndType(std::string_view name, std::string_view type) -> uint16_t;
 
         [[nodiscard]] auto getUtf8Index(std::string_view value) const -> std::expected<uint16_t, std::string>;
+        [[nodiscard]] auto getIntIndex(int32_t value) const -> std::expected<uint16_t, std::string>;
+        [[nodiscard]] auto getFloatIndex(float value) const -> std::expected<uint16_t, std::string>;
+        [[nodiscard]] auto getLongIndex(int64_t value) const -> std::expected<uint16_t, std::string>;
+        [[nodiscard]] auto getDoubleIndex(double value) const -> std::expected<uint16_t, std::string>;
         [[nodiscard]] auto getClassIndex(std::string_view className) const -> std::expected<uint16_t, std::string>;
         [[nodiscard]] auto getStringIndex(std::string_view value) const -> std::expected<uint16_t, std::string>;
         [[nodiscard]] auto getFieldrefIndex(std::string_view className, std::string_view fieldName, std::string_view descriptor) const -> std::expected<uint16_t, std::string>;

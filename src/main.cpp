@@ -1,14 +1,3 @@
-// #include <fstream>
-// #include <iostream>
-// #include <span>
-//
-// #include "jforge/bytecode/decoder.hpp"
-// #include "jforge/classfile/parser.hpp"
-// #include "jforge/classfile/printer.hpp"
-// #include "jforge/constant_pool/parser.hpp"
-// #include "jforge/constant_pool/printer.hpp"
-// #include "jforge/util/file.hpp"
-
 #include <iostream>
 #include <fstream>
 
@@ -16,6 +5,29 @@
 #include "jforge/builder/method_builder.hpp"
 #include "jforge/bytecode/decoder.hpp"
 #include "jforge/classfile/parser.hpp"
+
+void read(const std::filesystem::path& path)
+{
+    auto file = std::ifstream(path, std::ios::binary);
+    const auto classfile = jforge::classfile::readClassFile(file);
+    if (!classfile)
+    {
+        std::cerr << "Failed to read class file: " << classfile.error() << std::endl;
+        return;
+    }
+    for (const auto& method: classfile->methods)
+    {
+        for (const auto& attr : method.attributes)
+        {
+            if (classfile->constantPool.getUtf8(attr.nameIndex) == "Code")
+            {
+                const auto& code = std::get<jforge::attributes::Code>(attr.value);
+                jforge::bytecode::printBytecodes(classfile->constantPool, std::span(code.code));
+            }
+        }
+        std::cout << "------------------------------------------\n";
+    }
+}
 
 int main(const int argc, const char *argv[])
 {
@@ -36,44 +48,48 @@ int main(const int argc, const char *argv[])
         init.invokespecial("java/lang/Object", "<init>", "()V");
         init.ret();
 
-        auto mb = jforge::builder::MethodBuilder(
+        auto printInt = jforge::builder::MethodBuilder(
             jforge::access::Method::Public | jforge::access::Method::Static,
-            "main", "([Ljava/lang/String;)V"
+            "printInt",
+            "()V"
         );
-        mb.getstatic("java/lang/System", "out", "Ljava/io/PrintStream;");
-        mb.ldcString("Hello World!");
-        mb.invokevirtual("java/io/PrintStream", "println", "(Ljava/lang/String;)V");
-        mb.ret();
+        printInt.getstatic("java/lang/System", "out", "Ljava/io/PrintStream;");
+        printInt.iconst_1();
+        printInt.iconst_2();
+        printInt.iadd();
+        printInt.invokevirtual("java/io/PrintStream", "println", "(I)V");
+        printInt.ret();
+
+        auto main = jforge::builder::MethodBuilder(
+            jforge::access::Method::Public | jforge::access::Method::Static,
+            "main",
+            "([Ljava/lang/String;)V"
+        );
+        main.getstatic("java/lang/System", "out", "Ljava/io/PrintStream;");
+        main.ldcString("Hello World!");
+        main.invokevirtual("java/io/PrintStream", "println", "(Ljava/lang/String;)V");
+
+
+        main.invokestatic("Output", "printInt", "()V");
+
+        main.ret();
+
+
 
         auto cb = jforge::builder::ClassBuilder("Output");
         cb.addMethod(std::move(init));
-        cb.addMethod(std::move(mb));
+        cb.addMethod(std::move(printInt));
+        cb.addMethod(std::move(main));
 
-        auto res = cb.emit("./Output.class");
-        if (!res)
+        if (auto res = cb.emit("./Output.class"); !res)
         {
             std::cerr << "Failed to emit output class: " << res.error();
             return 1;
         }
         return 0;
     }
-    auto file = std::ifstream(argv[1], std::ios::binary);
-    const auto classfile = jforge::classfile::readClassFile(file);
-    if (!classfile)
+    else
     {
-        std::cerr << "Failed to read class file: " << classfile.error() << std::endl;
-        return 1;
-    }
-    for (const auto& method: classfile->methods)
-    {
-        for (const auto& attr : method.attributes)
-        {
-            if (classfile->constantPool.getUtf8(attr.nameIndex) == "Code")
-            {
-                const auto& code = std::get<jforge::attributes::Code>(attr.value);
-                jforge::bytecode::printBytecodes(classfile->constantPool, std::span(code.code));
-            }
-        }
-        std::cout << "------------------------------------------\n";
+        read(argv[1]);
     }
 }
