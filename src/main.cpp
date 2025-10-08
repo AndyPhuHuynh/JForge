@@ -44,7 +44,7 @@ int main(const int argc, const char *argv[])
             "()V"
         );
 
-        init.aload0();
+        init.aload_0();
         init.invokespecial("java/lang/Object", "<init>", "()V");
         init.ret();
 
@@ -58,6 +58,34 @@ int main(const int argc, const char *argv[])
         printInt.iconst_2();
         printInt.iadd();
         printInt.invokevirtual("java/io/PrintStream", "println", "(I)V");
+        printInt.ldcInt(10);
+        printInt.istore_1();
+        printInt.ldcFloat(6.4);
+        printInt.f2i();
+        printInt.istore_2();
+        printInt.iinc(2, 10);
+
+        // Print Int 1
+        printInt.getstatic("java/lang/System", "out", "Ljava/io/PrintStream;");
+        printInt.ldcString("Int One: ");
+        printInt.invokevirtual("java/io/PrintStream", "print", "(Ljava/lang/String;)V");
+        printInt.getstatic("java/lang/System", "out", "Ljava/io/PrintStream;");
+        printInt.iload_1();
+        printInt.invokevirtual("java/io/PrintStream", "println", "(I)V");
+
+        // Print Int 2
+        printInt.getstatic("java/lang/System", "out", "Ljava/io/PrintStream;");
+        printInt.ldcString("Int Two: ");
+        printInt.invokevirtual("java/io/PrintStream", "print", "(Ljava/lang/String;)V");
+        printInt.getstatic("java/lang/System", "out", "Ljava/io/PrintStream;");
+        printInt.iload_2();
+        printInt.invokevirtual("java/io/PrintStream", "println", "(I)V");
+
+        printInt.getstatic("java/lang/System", "out", "Ljava/io/PrintStream;");
+        printInt.iload_1();
+        printInt.iload_2();
+        printInt.isub();
+        printInt.invokevirtual("java/io/PrintStream", "println", "(I)V");
         printInt.ret();
 
         auto main = jforge::builder::MethodBuilder(
@@ -68,7 +96,6 @@ int main(const int argc, const char *argv[])
         main.getstatic("java/lang/System", "out", "Ljava/io/PrintStream;");
         main.ldcString("Hello World!");
         main.invokevirtual("java/io/PrintStream", "println", "(Ljava/lang/String;)V");
-
 
         main.invokestatic("Output", "printInt", "()V");
 

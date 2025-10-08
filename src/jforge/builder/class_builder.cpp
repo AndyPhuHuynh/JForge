@@ -71,13 +71,25 @@ namespace jforge::builder
             cp.addUtf8(method.getDescriptor());
             for (const auto& instruction: method.getInstructions()) {
                 std::visit([&]<typename T>(const T& inst) {
-                    if constexpr (std::is_same_v<T, InstructionLdcString>) {
+                    if constexpr (std::is_same_v<T, bytecode::InstructionLdcInt>) {
+                        cp.addInt(inst.value);
+                    }
+                    if constexpr (std::is_same_v<T, bytecode::InstructionLdcFloat>) {
+                        cp.addFloat(inst.value);
+                    }
+                    if constexpr (std::is_same_v<T, bytecode::InstructionLdcLong>) {
+                        cp.addLong(inst.value);
+                    }
+                    if constexpr (std::is_same_v<T, bytecode::InstructionLdcDouble>) {
+                        cp.addDouble(inst.value);
+                    }
+                    if constexpr (std::is_same_v<T, bytecode::InstructionLdcString>) {
                         cp.addString(inst.value);
                     }
-                    else if constexpr (std::is_same_v<T, InstructionFieldArg>) {
+                    else if constexpr (std::is_same_v<T, bytecode::InstructionFieldArg>) {
                         cp.addFieldref(inst.className, inst.fieldName, inst.descriptor);
                     }
-                    else if constexpr (std::is_same_v<T, InstructionMethodArg>) {
+                    else if constexpr (std::is_same_v<T, bytecode::InstructionMethodArg>) {
                         cp.addMethodref(inst.className, inst.methodName, inst.descriptor);
                     }
                 }, instruction);

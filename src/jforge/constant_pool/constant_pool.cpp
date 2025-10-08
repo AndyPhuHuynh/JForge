@@ -232,7 +232,7 @@ namespace jforge::constant_pool
         m_entries.emplace_back(IntegerInfo{ .value = value });
 
         const auto index = static_cast<uint16_t>(m_entries.size() - 1);
-        m_classEntries.emplace(value, index);
+        m_intEntries.emplace(value, index);
         return index;
     }
 
@@ -243,7 +243,7 @@ namespace jforge::constant_pool
         m_entries.emplace_back(FloatInfo{ .value = value });
 
         const auto index = static_cast<uint16_t>(m_entries.size() - 1);
-        m_classEntries.emplace(value, index);
+        m_floatEntries.emplace(value, index);
         return index;
     }
 
@@ -254,7 +254,7 @@ namespace jforge::constant_pool
         m_entries.emplace_back(LongInfo{ .value = value });
 
         const auto index = static_cast<uint16_t>(m_entries.size() - 1);
-        m_classEntries.emplace(value, index);
+        m_longEntries.emplace(value, index);
         return index;
     }
 
@@ -265,7 +265,7 @@ namespace jforge::constant_pool
         m_entries.emplace_back(DoubleInfo{ .value = value });
 
         const auto index = static_cast<uint16_t>(m_entries.size() - 1);
-        m_classEntries.emplace(value, index);
+        m_doubleEntries.emplace(value, index);
         return index;
     }
 

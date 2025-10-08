@@ -34,9 +34,9 @@ set(INCLUDE_FILES
 
         include/jforge/writer/constant_pool_writer.hpp
 
-        include/jforge/opcode.hpp
+        include/jforge/bytecode/opcode.hpp
         include/jforge/builder/attribute_builder.hpp
-        include/jforge/instructions.hpp
+        include/jforge/bytecode/instructions.hpp
         include/jforge/util/vector.hpp
         include/jforge/attributes/length.hpp
         include/jforge/attributes/names.hpp

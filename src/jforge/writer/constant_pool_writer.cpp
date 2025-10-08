@@ -23,6 +23,14 @@ namespace jforge::writer
                 util::write_bytes_be(os, e.length);
                 os.write(e.bytes.data(), e.length);
             }
+            else if constexpr (
+                std::is_same_v<T, constant_pool::IntegerInfo> ||
+                std::is_same_v<T, constant_pool::FloatInfo> ||
+                std::is_same_v<T, constant_pool::LongInfo> ||
+                std::is_same_v<T, constant_pool::DoubleInfo>)
+            {
+                util::write_bytes_be(os, e.value);
+            }
             else if constexpr (std::is_same_v<T, constant_pool::ClassInfo>)
             {
                 util::write_bytes_be(os, e.nameIndex);

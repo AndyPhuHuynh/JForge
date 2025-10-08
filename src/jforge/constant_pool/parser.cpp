@@ -27,6 +27,26 @@ auto jforge::constant_pool::readPoolEntry(std::istream& stream) -> std::expected
             }
             return Utf8Info{ length, std::move(bytes) };
         }
+        case Tag::Integer: // 3
+            {
+                const auto value = util::read_bytes_be<int32_t>(stream);
+                return IntegerInfo{ value };
+            }
+        case Tag::Float: // 4
+            {
+                const auto value = util::read_bytes_be<float>(stream);
+                return FloatInfo{ value };
+            }
+        case Tag::Long: // 5
+            {
+                const auto value = util::read_bytes_be<int64_t>(stream);
+                return LongInfo{ value };
+            }
+        case Tag::Double: // 3
+            {
+                const auto value = util::read_bytes_be<double>(stream);
+                return DoubleInfo{ value };
+            }
         case Tag::Class: // 7
         {
             const auto nameIndex = util::read_bytes_be<uint16_t>(stream);

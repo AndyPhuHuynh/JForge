@@ -1,6 +1,7 @@
 #pragma once
 
 #include <bit>
+#include <cstring>
 #include <istream>
 
 namespace jforge::util
@@ -8,19 +9,21 @@ namespace jforge::util
     template <typename T>
     auto read_bytes_be(std::istream& stream) -> T
     {
-        T t;
-        stream.read(reinterpret_cast<char *>(&t), sizeof(T));
+        char buffer[sizeof(T)];
+        stream.read(buffer, sizeof(T));
         if constexpr (std::endian::native != std::endian::big)
-            t = std::byteswap(t); // NOLINT (unreachable-code)
-        return t;
+            std::reverse(buffer, buffer + sizeof(T)); // NOLINT (unreachable-code)
+        return std::bit_cast<T>(buffer);
     }
 
     template <typename T>
     auto write_bytes_be(std::ostream& stream, T t) -> void
     {
+        char buffer[sizeof(T)];
+        std::memcpy(buffer, &t, sizeof(T));
         if constexpr (std::endian::native != std::endian::big)
-            t = std::byteswap(t); // NOLINT (unreachable-code)
-        stream.write(reinterpret_cast<char *>(&t), sizeof(T));
+            std::reverse(buffer, buffer + sizeof(T)); // NOLINT (unreachable-code)
+        stream.write(buffer, sizeof(T));
     }
 
     template <std::size_t N>

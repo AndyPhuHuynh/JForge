@@ -123,7 +123,11 @@ namespace jforge::constant_pool
         {
             if constexpr (std::is_same_v<T, NullInfo>)               return Tag::None;
             if constexpr (std::is_same_v<T, Utf8Info>)               return Tag::Utf8;
-            if constexpr (std::is_same_v<T, ClassInfo>)              return Tag::Class;
+            if constexpr (std::is_same_v<T, IntegerInfo>)            return Tag::Integer;
+            if constexpr (std::is_same_v<T, FloatInfo>)              return Tag::Float;
+            if constexpr (std::is_same_v<T, LongInfo>)               return Tag::Long;
+            if constexpr (std::is_same_v<T, DoubleInfo>)             return Tag::Double;
+            if constexpr (std::is_same_v<T, ClassInfo>)             return Tag::Class;
             if constexpr (std::is_same_v<T, StringInfo>)             return Tag::String;
             if constexpr (std::is_same_v<T, FieldrefInfo>)           return Tag::Fieldref;
             if constexpr (std::is_same_v<T, MethodrefInfo>)          return Tag::Methodref;
@@ -137,6 +141,10 @@ namespace jforge::constant_pool
     [[nodiscard]] constexpr auto tagFromType() -> Tag
     {
         if constexpr (std::is_same_v<EntryType, Utf8Info>)                    return Tag::Utf8;
+        else if constexpr (std::is_same_v<EntryType, IntegerInfo>)            return Tag::Integer;
+        else if constexpr (std::is_same_v<EntryType, FloatInfo>)              return Tag::Float;
+        else if constexpr (std::is_same_v<EntryType, LongInfo>)               return Tag::Long;
+        else if constexpr (std::is_same_v<EntryType, DoubleInfo>)             return Tag::Double;
         else if constexpr (std::is_same_v<EntryType, ClassInfo>)              return Tag::Class;
         else if constexpr (std::is_same_v<EntryType, StringInfo>)             return Tag::String;
         else if constexpr (std::is_same_v<EntryType, FieldrefInfo>)           return Tag::Fieldref;
