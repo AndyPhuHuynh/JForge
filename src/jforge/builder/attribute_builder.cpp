@@ -1,9 +1,11 @@
 #include "jforge/builder/attribute_builder.hpp"
 
+#include <cstring>
 #include <iostream>
 #include <limits>
+#include <unordered_map>
 
-#include "../../../include/jforge/bytecode/opcode.hpp"
+#include "jforge/bytecode/opcode.hpp"
 #include "jforge/util/vector.hpp"
 
 namespace jforge::builder
@@ -18,18 +20,35 @@ namespace jforge::builder
         attr.maxStack = 100;
         attr.maxLocals = 100;
 
+        using Index = int32_t;
+        std::unordered_map<bytecode::Label, Index> labelIndices;
+        std::unordered_map<Index, bytecode::Label> unresolvedLabels;
+
         for (const auto& instruction : instructions)
         {
             auto errorMsg = std::visit([&]<typename T>(const T& inst) -> std::string {
-                if constexpr (std::is_same_v<T, bytecode::InstructionOneArgInt8>) {
+                if constexpr (std::is_same_v<T, bytecode::Label>) {
+                    if (labelIndices.contains(inst)) {
+                        return inst.getName().empty() ?
+                            std::string("Unnamed label was placed twice") :
+                            std::format("Label \"{}\" was placed twice", inst.getName());
+                    }
+                    labelIndices[inst] = static_cast<Index>(attr.code.size());
+                }
+                else if constexpr (std::is_same_v<T, bytecode::InstructionGoTo>) {
+                    unresolvedLabels[static_cast<Index>(attr.code.size())] = inst.label;
+                    attr.code.push_back(static_cast<uint8_t>(bytecode::OpCode::goto_w));
+                    util::push_back_be(attr.code, static_cast<Index>(0));
+                }
+                else if constexpr (std::is_same_v<T, bytecode::InstructionOneArgInt8>) {
                     attr.code.push_back(static_cast<uint8_t>(inst.opcode));
                     util::push_back_be(attr.code, inst.value);
                 }
-                if constexpr (std::is_same_v<T, bytecode::InstructionOneArgInt8>) {
+                else if constexpr (std::is_same_v<T, bytecode::InstructionOneArgInt8>) {
                     attr.code.push_back(static_cast<uint8_t>(inst.opcode));
                     util::push_back_be(attr.code, inst.value);
                 }
-                if constexpr (std::is_same_v<T, bytecode::InstructionOneArgInt16>) {
+                else if constexpr (std::is_same_v<T, bytecode::InstructionOneArgInt16>) {
                     attr.code.push_back(static_cast<uint8_t>(inst.opcode));
                     util::push_back_be(attr.code, inst.value);
                 }
@@ -39,8 +58,8 @@ namespace jforge::builder
                     if (*intIndex <= std::numeric_limits<uint8_t>::max()) {
                         attr.code.push_back(static_cast<uint8_t>(bytecode::OpCode::ldc));
                         util::push_back_be(attr.code, static_cast<uint8_t>(intIndex.value()));
-                    } else
-                    {
+                    }
+                    else {
                         attr.code.push_back(static_cast<uint8_t>(bytecode::OpCode::ldc_w));
                         util::push_back_be(attr.code, static_cast<uint16_t>(intIndex.value()));
                     }
@@ -122,6 +141,33 @@ namespace jforge::builder
             if (!errorMsg.empty())
                 return std::unexpected(errorMsg);
         }
+
+        // Resolve gotos
+        for (const auto& [label, index] : labelIndices)
+        {
+            if (index == attr.code.size())
+                return label.getName().empty() ?
+                    std::unexpected<std::string>("Label cannot be placed as the last instruction of the method") :
+                    std::unexpected(std::format(
+                        "Label \"{}\" cannot be placed as the last instruction of the method",
+                        label.getName()));
+        }
+        for (const auto& [index, label] : unresolvedLabels)
+        {
+            if (!labelIndices.contains(label))
+                return label.getName().empty() ?
+                    std::unexpected<std::string>("Attempted to goto unplaced label") :
+                    std::unexpected(std::format(
+                        "Attempted to goto unplaced label \"{}\"",
+                        label.getName()));
+            Index offset = labelIndices[label] - index;
+            if constexpr (std::endian::native != std::endian::big)
+                std::reverse(
+                    reinterpret_cast<char *>(&offset),
+                    reinterpret_cast<char *>(&offset) + sizeof(offset)); // NOLINT
+            std::memcpy(attr.code.data() + index + 1, &offset, sizeof(offset));
+        }
+
         attr.codeLength = attr.code.size();
 
         attr.exceptionTableLength = 0;

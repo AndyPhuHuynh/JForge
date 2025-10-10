@@ -196,14 +196,16 @@ namespace jforge::bytecode
         dcmpl         = 0x97,
         dcmpg         = 0x98,
 
+        goto_         = 0xa7,
+
         ret           = 0xb1,
         getstatic     = 0xb2,
         invokevirtual = 0xb6,
         invokespecial = 0xb7,
         invokestatic  = 0xb8,
+
+        goto_w        = 0xc8,
     };
-
-
 
     constexpr auto opCodeFromNum(const uint8_t opcode) -> OpCode
     {
@@ -398,11 +400,15 @@ namespace jforge::bytecode
         case 0x97: return OpCode::dcmpl;
         case 0x98: return OpCode::dcmpg;
 
+        case 0xa7: return OpCode::goto_;
+
         case 0xb1: return OpCode::ret;
         case 0xb2: return OpCode::getstatic;
         case 0xb6: return OpCode::invokevirtual;
         case 0xb7: return OpCode::invokespecial;
         case 0xb8: return OpCode::invokestatic;
+
+        case 0xc8: return OpCode::goto_w;
         default:   return OpCode::none;
         }
     }
@@ -601,11 +607,15 @@ namespace jforge::bytecode
         case OpCode::dcmpl:         return "dcmpl";
         case OpCode::dcmpg:         return "dcmpg";
 
+        case OpCode::goto_:         return "goto";
+
         case OpCode::ret:           return "return";
         case OpCode::getstatic:     return "getstatic";
         case OpCode::invokevirtual: return "invokevirtual";
         case OpCode::invokespecial: return "invokespecial";
         case OpCode::invokestatic:  return "invokestatic";
+
+        case OpCode::goto_w:        return "goto_w";
         }
         return "unsupported";
     }

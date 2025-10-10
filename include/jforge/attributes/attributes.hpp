@@ -4,6 +4,8 @@
 #include <variant>
 #include <vector>
 
+#include "jforge/attributes/stack/frame.hpp"
+
 namespace jforge::attributes
 {
     struct AttributeInfo;
@@ -28,6 +30,11 @@ namespace jforge::attributes
         std::vector<AttributeInfo> attributes;
     };
 
+    struct StackMapTable // section 4.7.4
+    {
+        std::vector<stack::StackMapFrame> entries;
+    };
+
     struct SourceFile // section 4.7.10
     {
         uint16_t sourceFileIndex;
@@ -47,6 +54,7 @@ namespace jforge::attributes
 
     using AttributeVariant = std::variant<
         Code,
+        StackMapTable,
         SourceFile,
         LineNumberTable
     >;

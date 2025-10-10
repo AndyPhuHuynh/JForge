@@ -27,7 +27,7 @@ namespace jforge::util
     }
 
     template <std::size_t N>
-    std::string formatHex(const uint8_t (&arr)[N]) {
+    std::string formatHex(const char (&arr)[N]) {
         std::string out;
         out.reserve(N * 2);
         for (auto b : arr) {

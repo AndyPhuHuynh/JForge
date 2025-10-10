@@ -1,4 +1,5 @@
-#include "jforge/attributes/parser.hpp"
+#include "jforge/attributes/reader.hpp"
+#include "jforge/attributes/stack/reader.hpp"
 
 #include <iostream>
 
@@ -38,6 +39,20 @@ auto jforge::attributes::readCode( // NOLINT (misc-no-recursion)
     return code;
 }
 
+auto jforge::attributes::readStackMapTable(std::istream& stream) -> std::expected<StackMapTable, std::string>
+{
+    StackMapTable table;
+    const auto entryCount = util::read_bytes_be<uint16_t>(stream);
+    for (int i = 0; i < entryCount; i++)
+    {
+        auto entry = stack::readFrame(stream);
+        if (!entry)
+            return std::unexpected(std::format("Unable to read stack map table: {}", entry.error()));
+        table.entries.emplace_back(std::move(*entry));
+    }
+    return table;
+}
+
 auto jforge::attributes::readSourceFile(std::istream& stream) -> SourceFile
 {
     return { .sourceFileIndex = util::read_bytes_be<uint16_t>(stream) };
@@ -69,16 +84,22 @@ auto jforge::attributes::readAttribute( // NOLINT (misc-no-recursion)
     if (!type)
         return std::unexpected(type.error());
 
-    if (type == CodeID) {
+    if (*type == CodeID) {
         auto code = readCode(stream, cp);
         if (!code)
             return std::unexpected(code.error());
         attr.value = std::move(*code);
     }
-    else if (type == SourceFileID) {
+    else if (*type == StackMapTableID) {
+        auto table = readStackMapTable(stream);
+        if (!table)
+            return std::unexpected(table.error());
+        attr.value = std::move(*table);
+    }
+    else if (*type == SourceFileID) {
         attr.value = readSourceFile(stream);
     }
-    else if (type == LineNumberTableId) {
+    else if (*type == LineNumberTableId) {
         attr.value = readLineNumberTable(stream);
     }
     else {

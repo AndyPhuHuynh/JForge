@@ -309,6 +309,14 @@ auto jforge::bytecode::printBytecodes(const constant_pool::ConstantPool& cp, con
         case OpCode::fcmpg:    // 0x96
         case OpCode::dcmpl:    // 0x97
         case OpCode::dcmpg:    // 0x98
+            {
+                std::cout << std::format("{}: {}\n", opcodeIndex, opCodeToString(opcode));
+            } break;
+        case OpCode::goto_:    // 0xa7
+            {
+                const auto label = span.read_bytes_be<uint16_t>();
+                std::cout << std::format("{}: {: <14} {}\n", opcodeIndex, opCodeToString(opcode), label);
+            } break;
         case OpCode::ret:      // 0xb1
             {
                 std::cout << std::format("{}: {}\n", opcodeIndex, opCodeToString(opcode));
@@ -372,6 +380,11 @@ auto jforge::bytecode::printBytecodes(const constant_pool::ConstantPool& cp, con
                 }
                 std::cout << std::format("{}: {: <14} #{: <5} // Method {}.{}:{}\n",
                     opcodeIndex, "invokestatic", methodrefIndex, methodref->className, methodref->name, methodref->type);
+            } break;
+        case OpCode::goto_w:      // 0xc8
+            {
+                const auto label = span.read_bytes_be<uint32_t>();
+                std::cout << std::format("{}: {: <14} {}\n", opcodeIndex, opCodeToString(opcode), label);
             } break;
         }
     }

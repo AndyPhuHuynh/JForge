@@ -2,6 +2,7 @@
 
 #include <fstream>
 
+#include "jforge/attributes/names.hpp"
 #include "jforge/builder/attribute_builder.hpp"
 #include "jforge/util/file.hpp"
 #include "jforge/writer/classfile_writer.hpp"
@@ -60,7 +61,8 @@ namespace jforge::builder
         constant_pool::ConstantPool cp;
 
         // Attributes
-        cp.addUtf8("Code");
+        cp.addUtf8(attributes::CodeID);
+        cp.addUtf8(attributes::StackMapTableID);
 
         // This and super class
         cp.addClass(m_name);

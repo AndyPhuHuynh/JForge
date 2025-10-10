@@ -219,6 +219,9 @@ namespace jforge::builder
         void dcmpl();
         void dcmpg();
 
+        void addLabel(bytecode::Label label);
+        void gotoLabel(bytecode::Label label);
+
         void ret();
         void getstatic(std::string_view className, std::string_view fieldName, std::string_view descriptor);
         void invokevirtual(std::string_view className, std::string_view methodName, std::string_view descriptor);

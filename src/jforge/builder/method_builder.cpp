@@ -793,6 +793,16 @@ namespace jforge::builder
         m_instructions.emplace_back(bytecode::InstructionNoArg{ bytecode::OpCode::dcmpg });
     }
 
+    void MethodBuilder::addLabel(bytecode::Label label)
+    {
+        m_instructions.emplace_back(bytecode::Label{std::move(label)});
+    }
+
+    void MethodBuilder::gotoLabel(bytecode::Label label)
+    {
+        m_instructions.emplace_back(bytecode::InstructionGoTo{ .label = std::move(label) });
+    }
+
     void MethodBuilder::ret()
     {
         m_instructions.emplace_back(bytecode::InstructionNoArg{ bytecode::OpCode::ret });

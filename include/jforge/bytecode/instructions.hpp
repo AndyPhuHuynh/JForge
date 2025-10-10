@@ -4,6 +4,7 @@
 #include <variant>
 
 #include "jforge/bytecode/opcode.hpp"
+#include "jforge/bytecode/label.hpp"
 
 namespace jforge::bytecode
 {
@@ -57,7 +58,14 @@ namespace jforge::bytecode
         std::string descriptor;
     };
 
+    struct InstructionGoTo
+    {
+        Label label;
+    };
+
     using Instructions = std::variant<
+        Label,
+        InstructionGoTo,
         InstructionNoArg,
         InstructionOneArgInt8,
         InstructionOneArgUInt8,

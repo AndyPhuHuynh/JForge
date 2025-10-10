@@ -65,6 +65,9 @@ int main(const int argc, const char *argv[])
         printInt.istore_2();
         printInt.iinc(2, 10);
 
+        auto label = jforge::bytecode::Label("Skip Int 1");
+        printInt.gotoLabel(label);
+
         // Print Int 1
         printInt.getstatic("java/lang/System", "out", "Ljava/io/PrintStream;");
         printInt.ldcString("Int One: ");
@@ -72,6 +75,8 @@ int main(const int argc, const char *argv[])
         printInt.getstatic("java/lang/System", "out", "Ljava/io/PrintStream;");
         printInt.iload_1();
         printInt.invokevirtual("java/io/PrintStream", "println", "(I)V");
+
+        printInt.addLabel(label);
 
         // Print Int 2
         printInt.getstatic("java/lang/System", "out", "Ljava/io/PrintStream;");
@@ -100,8 +105,6 @@ int main(const int argc, const char *argv[])
         main.invokestatic("Output", "printInt", "()V");
 
         main.ret();
-
-
 
         auto cb = jforge::builder::ClassBuilder("Output");
         cb.addMethod(std::move(init));
